@@ -1,0 +1,759 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Сгенерируй 3 задачи по сложности, по математике на тему Логарифмы. Выдай ответ строго в формате:\nТекст задачи: [текст]\nОтвет: [число или краткое выражение]\""
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        272
+      ],
+      "id": "eea7ee2d-a667-4649-8855-ec16d28e73b2",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dZQXaBSBCxlKv0pe",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = items[0].json.output; // Получаем текст от Gemini\nconst taskPart = text.split('Ответ:')[0].replace('Текст задачи:', '').trim();\nconst answerPart = text.split('Ответ:')[1].trim();\n\nreturn {\n  task: taskPart,\n  correct_answer: answerPart\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        384
+      ],
+      "id": "2180a73b-9932-43e4-9a54-900d089dd09c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "03a47929-ed4e-47ca-8443-08d5d190b90f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5e871d9c-150e-4af7-a862-8b76eebf394f",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        -144
+      ],
+      "id": "e9db367a-5309-4bbf-8b07-84b7fa66a3d8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1wcCfSuUwC_OgvU2WM_v-5ge1y1zVWe6SQHkXTpjNn3o",
+          "mode": "list",
+          "cachedResultName": "Новая таблица",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wcCfSuUwC_OgvU2WM_v-5ge1y1zArb6SQHkXTpjNn3o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 898566088,
+          "mode": "list",
+          "cachedResultName": "Topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wcCfSuUwC_OgvU2WM_v-5ge1y1zVWe6SQH7dfpjNn3o/edit#gid=898566088"
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        624
+      ],
+      "id": "259664a8-0c56-4f47-98fb-29c2acb5ac6a",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "ZApop9VSnsUhrmmd",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        208
+      ],
+      "id": "4a22278e-015e-43f1-a5f5-9959cae7d732",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "fa5e5440-1625-41dd-8e19-54ba42afc6f4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dZQXaBSBCxlKv0pe",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        208
+      ],
+      "id": "4d17fee9-e013-48a5-b661-80536da75ece",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        624
+      ],
+      "id": "72fe7a9c-a805-4978-ab35-8751f7275c90",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1wcCfSuUwC_OgvU2WM_v-5ge1y1zVWe6SQHkXTpjNn3o",
+          "mode": "list",
+          "cachedResultName": "Новая таблица",
+          "cachedResultUrl": "я стер"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1203516300,
+          "mode": "list",
+          "cachedResultName": "Schedule",
+          "cachedResultUrl": "я стер"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Chat ID",
+              "lookupValue": "={{ $json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        496
+      ],
+      "id": "cc6447bb-4093-4938-8ae7-0405fea2aa48",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleApi": {
+          "id": "ZApop9VSnsUhrmmd",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "я стер",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"ВАШ_CHAT_ID\",\n  \"text\": \"{{ $json.message }}\",\n  \"parse_mode\": \"HTML\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1328,
+        464
+      ],
+      "id": "c7821679-5688-460c-835e-3581f47f190e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const topics = $input.all();\n\n// Берём дату в московском времени\nconst now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));\nconst day = String(now.getDate()).padStart(2, '0');\nconst month = String(now.getMonth() + 1).padStart(2, '0');\nconst year = now.getFullYear();\nconst today = `${day}.${month}.${year}`;\n\nconst todayTopic = topics.find(row => row.json.Дата && row.json.Дата.trim() === today);\n\nif (!todayTopic) {\n  return [{ json: { error: `Ищем: ${today}`, всего_тем: topics.length } }];\n}\n\nreturn [{\n  json: {\n    topic: todayTopic.json.Тема,\n    class: todayTopic.json.Класс,\n    difficulty: todayTopic.json.Сложность,\n    date: today\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        624
+      ],
+      "id": "c03d3338-4fa6-469f-8a92-709f01b1de59",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "я стер ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Сгенерируй 3 задания по теме '{{ $json.topic }}'. Оформи красиво с эмодзи и HTML тегами <b> и <code> для Telegram. Каждое задание пронумеруй. Решения не показывай и не говори что делать, строго пример.\"\n    }]\n  }]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        720,
+        624
+      ],
+      "id": "e973d7b7-6c48-41d1-b981-43f19a16d809",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst text = response.candidates[0].content.parts[0].text;\n\nconst prev = $('Code in JavaScript1').first().json;\n\nconst message = `📚 <b>Тема дня: ${prev.topic}</b>\n📅 ${prev.date}\n\n${text}\n\n💡 Напиши ответ на любое задание или /hint1 /hint2 /hint3 для подсказки`;\n\nreturn [{ json: { message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        624
+      ],
+      "id": "f08d1bc7-1435-4ab0-845e-a06bbebdb738",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "я стер",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "6343809446"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1136,
+        624
+      ],
+      "id": "d8e395e1-a5e7-4f12-adcd-be082a552479",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1wcCfSuUwC_OgvU2WM_v-5ge1y1zVWe6SQHkXTpjNn3o",
+          "mode": "list",
+          "cachedResultName": "Новая таблица",
+          "cachedResultUrl": "я стер"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1203516300,
+          "mode": "list",
+          "cachedResultName": "Schedule",
+          "cachedResultUrl": "я стер"
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        256,
+        0
+      ],
+      "id": "516d24bf-a3b8-4cf9-9e72-0b7d2f4b6c79",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleApi": {
+          "id": "ZApop9VSnsUhrmmd",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wcCfSuUwC_OgvU2WM_v-5ge1y1zVWe6SQHkXTpjNn3o",
+          "mode": "list",
+          "cachedResultName": "Новая таблица",
+          "cachedResultUrl": "я стер"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1203516300,
+          "mode": "list",
+          "cachedResultName": "Schedule",
+          "cachedResultUrl": "я стер"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Пользователь": "64802589446",
+            "Дата": "={{ $('Code in JavaScript1').first().json.date }}",
+            "Тема": "={{ $('Code in JavaScript1').first().json.topic }}",
+            "Статус": "активно"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Пользователь",
+              "displayName": "Пользователь",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Тема",
+              "displayName": "Тема",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Задание 1",
+              "displayName": "Задание 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Задание 2",
+              "displayName": "Задание 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Задание 3",
+              "displayName": "Задание 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        624
+      ],
+      "id": "6f56294d-d215-44cb-8114-cc0d30105bf9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "Zrmmd",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\nconst chatId = String($('Telegram Trigger').first().json.message.chat.id);\n\nconst activeRow = rows.find(row => \n  String(row.json.Chat_id) === chatId && \n  row.json.Статус === 'активно'\n);\n\nif (!activeRow) {\n  return [{ json: { error: 'Нет активного задания', chat_id: chatId } }];\n}\n\nreturn [{ json: activeRow.json }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "425622ff-0805-4dc1-acc0-533b5c4db69c",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "я стер",
+      "name": "Telegram Trigger",
+      "webhookId": "я стер",
+      "credentials": {
+        "telegramApi": {
+          "id": "я стер",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "я стер была версия gemini",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Ты репетитор по математике. Тема: '{{ $json.Тема }}'. Пользователь написал: '{{ $('Telegram Trigger').first().json.message.text }}'. Это может быть ответ на задание или просьба о подсказке. Если это ответ — проверь правильно ли решено и объясни ошибки если есть. Если просит подсказку — дай одну подсказку. Отвечай на русском с эмодзи и HTML тегами <b> и <code> для Telegram.\"\n    }]\n  }]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        0
+      ],
+      "id": "f9a7e65e-eee0-4565-95bc-3e4b966d7807",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "я стер",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').first().json.message.chat.id }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.candidates[0].content.parts[0].text }}"
+            },
+            {
+              "name": "parse_mode",
+              "value": "HTML"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        0
+      ],
+      "id": "я стер",
+      "name": "HTTP Request4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "я стер",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "я стер"
+  },
+  "id": "CjG8GRh0gouj34e2",
+  "tags": []
+}
